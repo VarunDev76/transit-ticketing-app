@@ -13,7 +13,7 @@ import FlashOff from "../../../assets/svg/FlashOff";
 import FlashOn from "../../../assets/svg/FlashOn";
 import { NavigationParams, NavigationScreenProp,NavigationState } from "react-navigation";
 import { Navigation } from "../../constants/navigation";
-import { atob } from "react-native-quick-base64";
+import base64 from "react-native-base64";
 
 const width = Dimensions.get("window").width;
 // const SignatureModule = NativeModules.SignatureModule;
@@ -28,71 +28,59 @@ export const ValidateTicket: React.FC<{
   const [ scanned, setScanned ] = useState(false);
   const dispatch = useDispatch();
 
-  const handleBarCodeScanned = async ( scanningResult: any ): Promise<void> => {
+  const checkBase64 = ( data: string ): any => {
     try {
-      if (!scanned) {
-        const { data } = scanningResult;
-        if(data) { 
-          setScanned(true);
-          try {
-            const result = atob(data);
-            if(result){
-              const splitString = result.split(";");
-              const signatureString = splitString[ splitString.length - 1 ].trim();
-              const sliceSign = signatureString.slice(0, 10);
-              const sliceMess = splitString.slice(0, splitString.length - 1).join(";");
-              const obj= {
-                sign: "",
-                mess: ""
-              };
-              if(sliceSign === "signature:") {
-                obj.mess = sliceMess;
-                obj.sign = signatureString.slice(10, signatureString.length);
-              }
-              if(obj.mess === "" || obj.sign === "" ){
-                // setTimeout(() => {
-                //   setScanned(false);
-                // }, 500);
-                navigation.navigate(Navigation.ValidateTicketResult);
-              }
-              else{
-                const pubKey = "h5W9FOm5C3POe7wQShwi+Uw7C8bMO5qiRSNHMgu/2vA=";
-                // const id = await SignatureModule.verified(obj.mess, obj.sign);
-                const id = await CrypticModule.verify(pubKey, obj.mess, obj.sign);
-                // eslint-disable-next-line no-console
-                console.log("id Calling::::::::::::::: ", id);
-                if(id) {
-                  const scannerTicketReq: ClientScannerTicketRequest = {
-                    scanner_status: true,
-                    scanner_result: obj.mess
-                  };
-                  // eslint-disable-next-line no-console
-                  console.log("Calling::::::::::::::: ");
-                  dispatch(setQRScannerTicket(scannerTicketReq));
-                }
-                navigation.navigate(Navigation.ValidateTicketResult);
-                // setTimeout(() => {
-                //   setScanned(false);
-                // }, 500);
-              }
-            }
-          } catch(er){
+      const result = base64.decode(data);
+      return result;
+    }
+    catch(e){
+      navigation.navigate(Navigation.ValidateTicketResult);
+    }
+  };
+
+  const handleBarCodeScanned = async ( scanningResult: any ): Promise<void> => {
+    if (!scanned) {
+      const { data } = scanningResult;
+      if(data) { 
+        const result = checkBase64(data);
+        setScanned(true);
+        if(result) {
+          const splitString = result.split(";");
+          const signatureString = splitString[ splitString.length - 1 ].trim();
+          const sliceSign = signatureString.slice(0, 10);
+          const sliceMess = splitString.slice(0, splitString.length - 1).join(";");
+          const obj= {
+            sign: "",
+            mess: ""
+          };
+          if(sliceSign === "signature:") {
+            obj.mess = sliceMess;
+            obj.sign = signatureString.slice(10, signatureString.length);
+          }
+          if(obj.mess === "" || obj.sign === "" ){
             // setTimeout(() => {
             //   setScanned(false);
             // }, 500);
-            // eslint-disable-next-line no-console
-            console.log("first catch Calling::::::::::::::: ");
             navigation.navigate(Navigation.ValidateTicketResult);
+          }
+          else{
+            const pubKey = "h5W9FOm5C3POe7wQShwi+Uw7C8bMO5qiRSNHMgu/2vA=";
+            // const id = await SignatureModule.verified(obj.mess, obj.sign);
+            const id = await CrypticModule.verify(pubKey, obj.mess, obj.sign);
+            if(id) {
+              const scannerTicketReq: ClientScannerTicketRequest = {
+                scanner_status: true,
+                scanner_result: obj.mess
+              };
+              dispatch(setQRScannerTicket(scannerTicketReq));
+            }
+            navigation.navigate(Navigation.ValidateTicketResult);
+            // setTimeout(() => {
+            //   setScanned(false);
+            // }, 500);
           }
         }
       }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log("last catch Calling::::::::::::::: ");
-      // setTimeout(() => {
-      //   setScanned(false);
-      // }, 500);
-      navigation.navigate(Navigation.ValidateTicketResult);
     }
   };
   return (
