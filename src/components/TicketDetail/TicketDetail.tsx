@@ -30,7 +30,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({
   const destinationLabel = "Destination";
   const ticketDetailsLabel = "Ticket details";
   // eslint-disable-next-line no-console
-  console.log(":::::::::::::origin", origin);
+  // console.log(":::::::::::::origin", origin);
   return (
     <View style={styles.card}>
       <Text style={styles.detailsHeader}>{ticketDetailsLabel}</Text>

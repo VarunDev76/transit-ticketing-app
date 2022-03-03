@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useDispatch, useSelector } from "react-redux";
 import { colors } from "../../../assets/theme/colors";
@@ -15,6 +15,10 @@ import { appendAM_PM, fareBreakUpGenerator, fetchFirstAvailableSlot } from "../.
 import { NavigationParams, NavigationScreenProp, NavigationState } from "react-navigation";
 import { setStationsList } from "../../store/actions/linkedStationAction";
 import { Navigation } from "../../constants/navigation";
+import { clearBlockTicketResponse, clearTicketResponse } from "../../store/actions/blockTicketAction";
+import { clearStationsLinkedToOrigin } from "../../store/actions/linkedStationAction";
+import { clearDestinationStation, clearOriginStation } from "../../store/actions/stationsAction";
+import { clearTrip } from "../../store/actions/tripsAction";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -46,12 +50,20 @@ export const IssueTicket: React.FC<{
     amount: KeyValueObject
   });
   const [ passengerCount, setPassengerCount ] = useState(0);
+  const stationlist = useSelector((state: State) => state.stations);
 
   useEffect(() => {
-    stationService.searchStations().then((res) => {
-      res && dispatch(setStationsList(res));
-    });
-  }, []);
+    if(stationlist && stationlist.length === 0) {
+      stationService.searchStations().then((res) => {
+        // eslint-disable-next-line no-console
+        // console.log("::::::::::::::::: res", res);
+        res && dispatch(setStationsList(res));
+      });
+    }
+  }, [ stationlist ]);
+
+  // useEffect(() => {
+  // })
 
   useEffect(() => {
     if (tripDetails.availability.length === 0) {
@@ -62,14 +74,28 @@ export const IssueTicket: React.FC<{
     }
     else {
       const result = fetchFirstAvailableSlot(tripDetails.availability);
+      if(typeof result === "undefined"){
+        setHideTripDetails(true);
+        setHideFairDetails(true);
+        setPassengerCount(0);
+        dispatch(clearBlockTicketResponse());
+        dispatch(clearTrip());
+        dispatch(clearStationsLinkedToOrigin());
+        dispatch(clearDestinationStation());
+        dispatch(clearOriginStation());
+        dispatch(clearTicketResponse());
+        alert("No tickets available for next time slots");
+        return;
+      }
       if (result) {
         setAvailableSlotTime(result.arrival.slot);
         setFareBreakUp(fareBreakUpGenerator(result.fare, passengerCount > 0 ? passengerCount : 1));
         setHideFairDetails(false);
+        setHideTripDetails(false);
         setTotalAvailableSeats(result.seats);
         setTripId(result.trip_id);
       }
-      setHideTripDetails(false);
+      // setHideTripDetails(false);
     }
   }, [ tripDetails.availability.length, passengerCount ]);
 
@@ -90,48 +116,49 @@ export const IssueTicket: React.FC<{
     stationService.clientBookTicket(blockTicketReq).then((res) => {
       res && dispatch(setBookTicket(res));
       // eslint-disable-next-line no-console
-      console.log("::::::::", res);
+      // console.log("::::::::", res);
       navigation.navigate(Navigation.BookingConfirmation);
     });
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcomeMessage}>{welcomeMessage}</Text>
-      <View style={styles.dropDown}>
-        <DropDown></DropDown>
-      </View>
-      {
-        !hideTripDetails &&
-        <View style={styles.tripDetailsContainer}>
-          <View style={styles.tripDetails}>
-            <SmallCard suffix="Available time slot"
-              label={appendAM_PM(availableSlotTime)}>
-            </SmallCard>
-            <Stepper
-              bubbleUpValue={passenger}
-              label={label}
-              maxLimit={totalAvailableSeats}>
-            </Stepper>
-          </View>
-          <Text style={styles.availableSeats}>{availableSeatsLabel + totalAvailableSeats}</Text>
-          <Text style={[ styles.fontBold, styles.fareLabel ]}>{fareDetailsLabel}</Text>
-
-          {
-            !hideFareDetails &&
-            <View style={styles.fareDetails}>
-              <FareDetails fareBreakUp={fareBreakUp}></FareDetails>
-            </View>}
-          <TouchableOpacity
-            disabled={passengerCount == 0 ? true : false}
-            onPress={() => passengerCount > 0 && bookClientTicket()}
-            style={[ styles.ticketButton, passengerCount > 0 ? styles.enabledButton : styles.disabledButton ]}
-          >
-            <Text style={styles.ticketButtonText}>{buttonLabel}</Text>
-          </TouchableOpacity>
+    <ScrollView>  
+      <View style={styles.container}>
+        <Text style={styles.welcomeMessage}>{welcomeMessage}</Text>
+        <View style={styles.dropDown}>
+          <DropDown></DropDown>
         </View>
-      }
-    </View>
+        {!hideTripDetails &&
+          <View style={styles.tripDetailsContainer}>
+            <View style={styles.tripDetails}>
+              <SmallCard suffix="Available time slot"
+                label={appendAM_PM(availableSlotTime)}>
+              </SmallCard>
+              <Stepper
+                bubbleUpValue={passenger}
+                label={label}
+                maxLimit={totalAvailableSeats}>
+              </Stepper>
+            </View>
+            <Text style={styles.availableSeats}>{availableSeatsLabel + totalAvailableSeats}</Text>
+            <Text style={[ styles.fontBold, styles.fareLabel ]}>{fareDetailsLabel}</Text>
+
+            {!hideFareDetails &&
+              <View style={styles.fareDetails}>
+                <FareDetails fareBreakUp={fareBreakUp}></FareDetails>
+              </View>
+            } 
+            <TouchableOpacity
+              disabled={passengerCount == 0 ? true : false}
+              onPress={() => passengerCount > 0 && bookClientTicket()}
+              style={[ styles.ticketButton, passengerCount > 0 ? styles.enabledButton : styles.disabledButton ]}
+            >
+              <Text style={styles.ticketButtonText}>{buttonLabel}</Text>
+            </TouchableOpacity>
+          </View>
+        } 
+      </View>
+    </ScrollView>
   );
 };
 
@@ -143,7 +170,7 @@ const styles = StyleSheet.create({
   },
   tripDetailsContainer: {
     position: "relative",
-    height: height / 1.5,
+    height: height / 1.6,
     justifyContent: "space-between"
 
   },

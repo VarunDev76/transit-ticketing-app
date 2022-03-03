@@ -8,9 +8,10 @@ import { NavigationParams, NavigationScreenProp, NavigationState } from "react-n
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../components/Button/Button";
 import TicketDetails from "../../components/TicketDetail/TicketDetail";
-import { clearBlockTicketResponse } from "../../store/actions/blockTicketAction";
+import { clearBlockTicketResponse, clearTicketResponse } from "../../store/actions/blockTicketAction";
 import { clearStationsList } from "../../store/actions/linkedStationAction";
 import { clearDestinationStation, clearOriginStation } from "../../store/actions/stationsAction";
+import { clearStationsLinkedToOrigin } from "../../store/actions/linkedStationAction";
 import { clearTrip } from "../../store/actions/tripsAction";
 import { State } from "../../store/reducers/reducer";
 import { appendAM_PM } from "../../utils/util";
@@ -35,15 +36,17 @@ const BookingConfirmation:React.FC<{
   const onPress = (navigation:  NavigationScreenProp<NavigationState,NavigationParams> ):void => {
     dispatch(clearBlockTicketResponse());
     dispatch(clearTrip());
+    dispatch(clearStationsLinkedToOrigin());
     dispatch(clearStationsList());
     dispatch(clearDestinationStation());
     dispatch(clearOriginStation());
+    dispatch(clearTicketResponse());
     navigation.navigate(Navigation.IssueTicket);
   };
   
   const { selected_slot, seats } = useSelector((state: State) => state.clientBookTicketResponse.trip);
   // eslint-disable-next-line no-console
-  console.log("selected_slot::::::::", selected_slot, seats);
+  // console.log("selected_slot::::::::", selected_slot, seats);
   const selectedSlot = appendAM_PM(selected_slot);
   const source = useSelector((state: State) => state.originStation.name);
   const destination = useSelector((state: State) => state.destinationStation.name);

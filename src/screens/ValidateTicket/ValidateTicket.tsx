@@ -67,11 +67,13 @@ export const ValidateTicket: React.FC<{
             const pubKey = "h5W9FOm5C3POe7wQShwi+Uw7C8bMO5qiRSNHMgu/2vA=";
             // const id = await SignatureModule.verified(obj.mess, obj.sign);
             const id = await CrypticModule.verify(pubKey, obj.mess, obj.sign);
-            if(id) {
+            if(id === true) {
               const scannerTicketReq: ClientScannerTicketRequest = {
                 scanner_status: true,
                 scanner_result: obj.mess
               };
+              // eslint-disable-next-line no-console
+              // console.log(scannerTicketReq);
               dispatch(setQRScannerTicket(scannerTicketReq));
             }
             navigation.navigate(Navigation.ValidateTicketResult);

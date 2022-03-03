@@ -5,7 +5,8 @@ import {
   Image,
   StyleSheet,
   Text,
-  View
+  View, 
+  Dimensions
 } from "react-native";
 import { NavigationParams, NavigationScreenProp, NavigationState } from "react-navigation";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +19,8 @@ import { clearTrip } from "../../store/actions/tripsAction";
 import { colors } from "../../../assets/theme/colors";
 import { Navigation } from "../../constants/navigation";
 import { State } from "../../store/reducers/reducer";
+
+const height = Dimensions.get("window").height;
 
 const ConfirmationBox = (): ReactElement => {
   return (
@@ -71,7 +74,7 @@ export const ValidateTicketResult:React.FC<{
     trip_id: ""
   };
   // eslint-disable-next-line no-console
-  console.log(splitData, "splitData", scanner_status);
+  // console.log(splitData, "splitData", scanner_status);
   scanner_status && splitData.map((item: any) => {
     let data = item.split(":");
 
@@ -146,15 +149,17 @@ export const ValidateTicketResult:React.FC<{
             )}
           </View>
           
-          <View style={[ styles.createTicketBtn, styles.flexRow ]}>
-            <Button isTansparent={!confirmStatus} label="Scan Another Ticket" onPress={() => onPress(navigation)} />
-          </View>
-
-          {!confirmStatus && (
+          <View style={[ styles.createTicketBtnParent ]}>
             <View style={[ styles.createTicketBtn, styles.flexRow ]}>
-              <Button label="Book another TICKET" onPress={() => onPress(navigation)} />
+              <Button isTansparent={!confirmStatus} label="Scan Another Ticket" onPress={() => onPress(navigation)} />
             </View>
-          )}
+
+            {!confirmStatus && (
+              <View style={[ styles.createTicketBtn, styles.flexRow ]}>
+                <Button label="Book another TICKET" onPress={() => onPress(navigation)} />
+              </View>
+            )}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -174,9 +179,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   container: {
+    position: "relative",
     justifyContent: "center",
     alignItems: "center",
-    height: "100%",
+    height: height,
     marginHorizontal: 15
   },
   mainContent: {
@@ -196,7 +202,16 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textAlign: "center",
     paddingTop: 20,
+    color: colors.Dim_Black,
     paddingBottom: 30
+  },
+  createTicketBtnParent: {
+    flexDirection: "column",
+    bottom: 100,
+    width: 350,
+    borderRadius: 14,
+    paddingVertical: 13,
+    alignItems: "center"
   },
   createTicketBtn: {
     marginVertical: 15,

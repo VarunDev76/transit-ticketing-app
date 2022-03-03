@@ -4,7 +4,7 @@ import { ClientBookTicketResponse } from "../response/clientBookTicketResponse";
 import { Station } from "../response/searchStationsResponse";
 import { SearchTripResponse } from "../response/searchTripResponse";
 
-const baseURL = "http://ec2-3-131-96-6.us-east-2.compute.amazonaws.com:8080/api/v1/secure";
+const baseURL = "http://ec2-3-144-144-182.us-east-2.compute.amazonaws.com:8080/api/v1/secure";
 const axiosInstance = axios.create({
   headers: { "X-API-KEY": "a8d6ge7d-5tsa-8d9c-m3b2-30e21c0e9564" }
 });

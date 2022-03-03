@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from "react";
-import { StyleSheet, View, Image, Text, ImageProps } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Image, Text, ImageProps } from "react-native";
 import Modal from "react-native-modal";
 import OriginToDestinationIcon from "../OriginToDestinationIcon/OriginToDestinationIcon";
 import { colors } from "../../../assets/theme/colors";
@@ -7,6 +7,7 @@ import { List } from "../List/List";
 import { useDispatch, useSelector } from "react-redux";
 import { State } from "../../store/reducers/reducer";
 import { setOriginStation, setDestinationStation } from "../../store/actions/stationsAction";
+import { clearDestinationStation } from "../../store/actions/stationsAction";
 import { stationService } from "../../services/stationService";
 import { setStationsLinkedToOrigin } from "../../store/actions/linkedStationAction";
 import { Station } from "../../response/searchStationsResponse";
@@ -39,6 +40,7 @@ const DropDown = (): ReactElement => {
 
   useEffect(() => {
     if (originStation.id === "") return;
+    if (originStation.id) dispatch(clearDestinationStation());
     stationService.searchStations(originStation.id).then((data) => {
       dispatch(setStationsLinkedToOrigin(data));
     });
@@ -115,13 +117,13 @@ const DropDown = (): ReactElement => {
 
   return (
     <><View style={[ styles.container, styles.box, styles.paddingHorizontalVertical ]}>
-      <View onTouchStart={() => { setModalVisibility(true); setLocation("origin"); }}>
+      <TouchableOpacity onPress={() => { setModalVisibility(true); setLocation("origin"); }}>
         {selectLocation(originStation.name, ORIGIN_PLACEHOLDER)}
-      </View>
+      </TouchableOpacity>
       <View style={styles.lineStyle} />
-      <View onTouchStart={() => { setModalVisibility(true); setLocation("destination"); }}>
+      <TouchableOpacity onPress={() => { setModalVisibility(true); setLocation("destination"); }}>
         {selectLocation(destinationStation.name, DESTINATION_PLACEHOLER)}
-      </View>
+      </TouchableOpacity>
       <OriginToDestinationIcon style={styles.icon}></OriginToDestinationIcon>
     </View>
     { showLoader && Loader(styles.loader)}
