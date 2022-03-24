@@ -27,7 +27,7 @@ const selectLocation = (location: string, placeholder: string): ReactElement => 
   );
 };
 
-const DropDown = (): ReactElement => {
+const DropDown : React.FC<{destinationUpdate: any}> = ({ destinationUpdate }): ReactElement => {
   const noAvailability = "Sorry! No Availability of slots.";
 
   const originStation = useSelector((state: State) => state.originStation);
@@ -40,7 +40,7 @@ const DropDown = (): ReactElement => {
 
   useEffect(() => {
     if (originStation.id === "") return;
-    if (originStation.id) dispatch(clearDestinationStation());
+    if (originStation.id) dispatch(clearDestinationStation()), destinationUpdate();
     stationService.searchStations(originStation.id).then((data) => {
       dispatch(setStationsLinkedToOrigin(data));
     });
@@ -48,8 +48,9 @@ const DropDown = (): ReactElement => {
 
   useEffect(() => {
     if (destinationStation.id === "") return;
+    if(destinationStation.id) destinationUpdate();
     stationService.searchTrips({ origin: originStation.id, destination: destinationStation.id }).then((data) => {
-      if(!data.availability.length) 
+      if(data.availability && !data.availability.length) 
         alert(noAvailability);
       else {
         setShowLoader(true);

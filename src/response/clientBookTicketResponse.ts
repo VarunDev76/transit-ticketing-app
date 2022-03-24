@@ -1,7 +1,11 @@
 import { ClientBookTicketRequest } from "../request/clientBookTicketRequest";
 import { Fare } from "./searchTripResponse";
-
 export interface BookedTicketTrip extends Omit<ClientBookTicketRequest, "slot">{
+  arrival: {
+    slot: string,
+    timestamp: string,
+    stop_id: string
+  },
   selected_slot: string,
   boat_id: string
 }

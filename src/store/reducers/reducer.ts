@@ -15,6 +15,11 @@ export type State = {
 const initialTrip = { source: "", destination: "", date: "" };
 const blockTrip = {
   ...initialTrip,
+  arrival: {
+    slot: "",
+    timestamp: "",
+    stop_id: ""
+  },
   selected_slot: "",
   seats: 0,
   trip_id: "",

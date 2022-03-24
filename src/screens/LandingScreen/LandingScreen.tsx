@@ -21,7 +21,7 @@ const height = Dimensions.get("window").height;
 const LandingScreen :React.FC<{
   navigation: NavigationScreenProp<NavigationState,NavigationParams>  
 }> = ({ navigation }): ReactElement => {
-  const loginPageTitle = "Kerala State Water Transport Department";
+  // const loginPageTitle = "Kerala State Water Transport Department";
   const issueTicketLabel = "Issue a new ticket";
   const validateTicketLabel = "Validate a ticket";
   const selectOneToContinue ="Select one to continue";
@@ -30,7 +30,13 @@ const LandingScreen :React.FC<{
       <View  style={styles.header}>
         <Header navigation= {navigation} showLogOutButton={true} />
       </View>
-      <Title label={loginPageTitle}></Title>
+
+      <View style={styles.Title}>
+        <Text style={styles.titleHeading}>Kerala State Water</Text>
+        <Text style={styles.titleHeading}>Transport Department</Text>
+        {/* <Title label={"Kerala State"}></Title> */}
+        {/* <Title label={"Water Transport Department"}></Title> */}
+      </View>
       <Slide  style={styles.bannerImage}></Slide>
       <View style={styles.buttonBox}>
         <Text style={styles.landingHeading}>{selectOneToContinue}</Text>
@@ -68,6 +74,21 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: width/1.1
   },
+  Title:{
+    position: "relative",
+    widtj: "100%",
+    marginTop: 20
+  },
+  titleHeading: {
+    width: "100%",
+    textAlign: "left",
+    marginLeft: -130,
+    marginBottom: 10,
+    fontSize: 24,
+    lineHeight: 29,
+    fontWeight: "600",
+    fontFamily: "Inter"
+  },
   buttonBox: {
     marginTop: 100,
     width: width /1.1
@@ -77,9 +98,9 @@ const styles = StyleSheet.create({
   },
   landingHeading: {
     marginBottom: 15,
-    fontSize: 16,
+    fontSize: 18,
     lineHeight: 19,
-    fontWeight: "300"
+    fontWeight: "600"
   },
   buttonBoxMargin: {
     marginVertical: 15,

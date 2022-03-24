@@ -27,8 +27,8 @@ export const IssueTicket: React.FC<{
   navigation: NavigationScreenProp<NavigationState,NavigationParams> 
 }> = ({ navigation }): ReactElement => {
   const label = "Number of passengers";
-  const buttonLabel = "CREATE TICKET";
-  const availableSeatsLabel = "Available Seats: ";
+  const buttonLabel = "BOOK TICKET";
+  const availableSeatsLabel = "Available tickets: ";
   const fareDetailsLabel = "Fare Details";
   const welcomeMessage = "Welcome Gopal Iyer,";
 
@@ -55,8 +55,7 @@ export const IssueTicket: React.FC<{
   useEffect(() => {
     if(stationlist && stationlist.length === 0) {
       stationService.searchStations().then((res) => {
-        // eslint-disable-next-line no-console
-        // console.log("::::::::::::::::: res", res);
+        dispatch(clearDestinationStation());
         res && dispatch(setStationsList(res));
       });
     }
@@ -73,6 +72,8 @@ export const IssueTicket: React.FC<{
       return;
     }
     else {
+      // eslint-disable-next-line no-console
+      // console.log("::::::: result", tripDetails.availability);
       const result = fetchFirstAvailableSlot(tripDetails.availability);
       if(typeof result === "undefined"){
         setHideTripDetails(true);
@@ -88,12 +89,26 @@ export const IssueTicket: React.FC<{
         return;
       }
       if (result) {
-        setAvailableSlotTime(result.arrival.slot);
-        setFareBreakUp(fareBreakUpGenerator(result.fare, passengerCount > 0 ? passengerCount : 1));
-        setHideFairDetails(false);
-        setHideTripDetails(false);
-        setTotalAvailableSeats(result.seats);
-        setTripId(result.trip_id);
+        if(!result.fare) {
+          setHideTripDetails(true);
+          setHideFairDetails(true);
+          setPassengerCount(0);
+          dispatch(clearBlockTicketResponse());
+          dispatch(clearTrip());
+          dispatch(clearStationsLinkedToOrigin());
+          dispatch(clearDestinationStation());
+          dispatch(clearOriginStation());
+          dispatch(clearTicketResponse());
+          alert("Fare data is Null");
+          return;
+        } else {
+          setAvailableSlotTime(result.arrival.slot);
+          setFareBreakUp(fareBreakUpGenerator(result.fare, passengerCount > 0 ? passengerCount : 1));
+          setHideFairDetails(false);
+          setHideTripDetails(false);
+          setTotalAvailableSeats(result.seats);
+          setTripId(result.trip_id);
+        }
       }
       // setHideTripDetails(false);
     }
@@ -121,12 +136,21 @@ export const IssueTicket: React.FC<{
     });
   };
 
+  const destinationUpdate = (): void => {
+    setHideTripDetails(true);
+    setHideFairDetails(true);
+    setPassengerCount(0);
+    dispatch(clearTrip());
+  };
+
   return (
     <ScrollView>  
       <View style={styles.container}>
         <Text style={styles.welcomeMessage}>{welcomeMessage}</Text>
         <View style={styles.dropDown}>
-          <DropDown></DropDown>
+          <DropDown 
+            destinationUpdate={destinationUpdate}
+          />
         </View>
         {!hideTripDetails &&
           <View style={styles.tripDetailsContainer}>
@@ -201,6 +225,7 @@ const styles = StyleSheet.create({
     top: height / 4.6,
     color: colors.Black,
     fontFamily: "Inter-Black",
+    fontWeight: "bold",
     fontSize: 16
   },
   fareLabel: {

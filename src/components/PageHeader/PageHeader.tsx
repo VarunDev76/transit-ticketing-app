@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import React, { ReactElement } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import LogOut from "../../../assets/svg/LogOut";
 import Logo from "../../../assets/svg/Logo";
 import BackIcon from "../../../assets/svg/BackIcon";
@@ -11,6 +12,7 @@ import { clearBlockTicketResponse } from "../../store/actions/blockTicketAction"
 import { clearStationsList } from "../../store/actions/linkedStationAction";
 import { clearDestinationStation, clearOriginStation } from "../../store/actions/stationsAction";
 import { clearTrip } from "../../store/actions/tripsAction";
+import { clearStationsLinkedToOrigin } from "../../store/actions/linkedStationAction";
 
 export const HeaderTitle = (): ReactElement => {
   const title = "Kerala State Water Transport Department";
@@ -27,7 +29,19 @@ export const HeaderTitle = (): ReactElement => {
 };
 
 export const HeaderLeft = (navigation: NavigationScreenProp<NavigationState,NavigationParams> ): ReactElement => {
-  return <TouchableOpacity onPress={() => navigation.goBack()}>
+  const dispatch = useDispatch();
+  const onPress = (navigation:  NavigationScreenProp<NavigationState,NavigationParams> ):void => {
+    dispatch(clearBlockTicketResponse());
+    dispatch(clearTrip());
+    dispatch(clearStationsList());
+    dispatch(clearDestinationStation());
+    dispatch(clearStationsLinkedToOrigin());
+    dispatch(clearOriginStation());
+    navigation.goBack();
+    // navigation.navigate(Navigation.Authorization);
+  };
+
+  return <TouchableOpacity style={styles.BackButton} onPress={() => onPress(navigation)}>
     <BackIcon style={styles.marginLeft}></BackIcon>
   </TouchableOpacity>;
 };
@@ -38,11 +52,29 @@ export const HeaderRight = (navigation: NavigationScreenProp<NavigationState,Nav
     dispatch(clearBlockTicketResponse());
     dispatch(clearTrip());
     dispatch(clearStationsList());
+    dispatch(clearStationsLinkedToOrigin());
     dispatch(clearDestinationStation());
     dispatch(clearOriginStation());
     navigation.navigate(Navigation.Authorization);
   };
-  return <TouchableOpacity onPress={() => onPress(navigation)}>
+
+  const handleModal = (navigation:  NavigationScreenProp<NavigationState,NavigationParams>): void => {
+    Alert.alert("Logout!", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        onPress: () => {}
+      },
+
+      {
+        text: "OK",
+        onPress: () => {
+          onPress(navigation);
+        }
+      }
+    ]);
+  };
+
+  return<TouchableOpacity style={styles.LogoutButton} onPress={() => handleModal(navigation)}>
     <LogOut style={ styles.logoutIcon } ></LogOut>
   </TouchableOpacity>;
 };
@@ -56,6 +88,22 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: "row",
     alignItems:"center"
+  },
+  LogoutButton: {
+    position: "relative",
+    display:"flex",
+    alignItems:"flex-end",
+    justifyContent: "center",
+    right: 10,
+    width: "100%",
+    height: "100%",
+    zIndex:2
+  },
+  BackButton: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%"
   },
   marginLeft: {
     marginLeft:20

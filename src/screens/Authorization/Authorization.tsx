@@ -25,14 +25,19 @@ const Authorization :React.FC<{
   const loginTitle = "Let’s get started";
   const forgotPasswordLabel = "Forgot Password?";
   const loginButtonLabel = "Login";
-  const loginPageTitle = "Kerala State Water Transport Department";
+  // const loginPageTitle = "Kerala State Water Transport Department";
 
   return(
     <View style={styles.boxContainer}>
       <View  style={styles.logo}>
         <Header showLogOutButton={false} />
       </View>
-      <Title label={loginPageTitle}></Title>
+      {/* <Title label={loginPageTitle}></Title> */}
+      <View style={styles.Title}>
+        <Text style={styles.titleHeading}>Kerala State</Text>
+        <Text style={styles.titleHeading}>Water Transport</Text>
+        <Text style={styles.titleHeading}>Department</Text>
+      </View>
       <Boat  style={styles.bannerImage}></Boat>
       <View style={ styles.inputTextBox }>
         <Text style={styles.inputText}>{loginTitle}</Text>
@@ -82,23 +87,39 @@ const styles = StyleSheet.create({
   inputTextBox: {
     marginTop: 40
   },
+  Title:{
+    position: "relative",
+    widtj: "100%",
+    marginTop: 20
+  },
+  titleHeading: {
+    width: "100%",
+    textAlign: "left",
+    marginLeft: -180,
+    marginBottom: 10,
+    fontSize: 24,
+    lineHeight: 29,
+    fontWeight: "600",
+    fontFamily: "Inter"
+  },
   logo: {
     marginTop: 10,
     right: width/3.05
   },
   inputText: {
-    fontWeight: "100",
+    fontWeight: "600",
     fontSize: 22,
     lineHeight: 20,
     marginVertical: 20,
-    color:colors.Grey_Black
+    color:colors.Grey_Black,
+    fontFamily: "Inter"
   },
   bannerImage: {
     marginTop: 15,
     marginLeft: "20%"
   },
   inputTextForgot: {
-    fontWeight: "100",
+    fontWeight: "600",
     fontSize: 16,
     marginTop: 30,
     lineHeight: 17,

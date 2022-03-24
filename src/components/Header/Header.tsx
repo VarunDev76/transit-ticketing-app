@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import React, { ReactElement } from "react";
 import {
   StyleSheet,
   View,
-  Text
+  Text,
+  Alert
 } from "react-native";
 import { NavigationParams, NavigationScreenProp, NavigationState } from "react-navigation";
 import LogOut from "../../../assets/svg/LogOut";
@@ -14,6 +16,21 @@ const Header: React.FC<{
   showLogOutButton?: boolean,
 }> = ({ navigation, showLogOutButton }): ReactElement => {
   const logoLabel = "Government of Kerala";
+  const handleModal = (navigation:  NavigationScreenProp<NavigationState,NavigationParams>): void => {
+    Alert.alert("Logout!", "Are you sure you want to logout?", [
+      {
+        text: "Cancel",
+        onPress: () => {}
+      },
+
+      {
+        text: "OK",
+        onPress: () => {
+          navigation.navigate(Navigation.Authorization);
+        }
+      }
+    ]);
+  };
   return (
     <View style={styles.logoBox}>
       <View>
@@ -21,7 +38,7 @@ const Header: React.FC<{
         <Text style={styles.logoLabel}>{logoLabel}</Text>
       </View>
       {showLogOutButton && navigation &&
-        <View onTouchEndCapture={() => navigation.navigate(Navigation.Authorization)} >
+        <View onTouchEndCapture={() => handleModal(navigation)} >
           <LogOut />
         </View>
       }

@@ -44,10 +44,10 @@ const BookingConfirmation:React.FC<{
     navigation.navigate(Navigation.IssueTicket);
   };
   
-  const { selected_slot, seats } = useSelector((state: State) => state.clientBookTicketResponse.trip);
+  const { seats, arrival } = useSelector((state: State) => state.clientBookTicketResponse.trip);
   // eslint-disable-next-line no-console
   // console.log("selected_slot::::::::", selected_slot, seats);
-  const selectedSlot = appendAM_PM(selected_slot);
+  const selectedSlot = appendAM_PM(arrival.slot);
   const source = useSelector((state: State) => state.originStation.name);
   const destination = useSelector((state: State) => state.destinationStation.name);
   return (

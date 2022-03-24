@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from "react";
+import React, { ReactElement, useState, useEffect } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { colors } from "../../../assets/theme/colors";
 import Passenger from "../../../assets/svg/Passengers";
@@ -18,20 +18,24 @@ export const Stepper: React.FC<{
     if (counter > 1) 
       setCounter(counter - 1);
   };
-  bubbleUpValue(counter);
+
+  useEffect(() => {
+    bubbleUpValue(counter);
+  }, [ counter ]);
+
   return (
     <View style={styles.container}>
       <Passenger style={styles.passengerIcon}></Passenger>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.incrementDecrement}>
         <View style={styles.button} onTouchStart={decrement}>
-          <Text style={styles.black_color}>-</Text>
+          <Text style={[ styles.black_color, styles.IconSize ]}>-</Text>
         </View>
         <Text style={styles.counter}>
           {counter}
         </Text>
         <View style={styles.button} onTouchStart={increment}>
-          <Text style={styles.black_color}>+</Text>
+          <Text style={[ styles.black_color, styles.IconSize ]}>+</Text>
         </View>
       </View>
     </View>
@@ -82,5 +86,8 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: colors.Black,
     fontFamily: "Inter-Black"
+  },
+  IconSize: {
+    fontSize: 18
   }
 });
